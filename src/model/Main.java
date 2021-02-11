@@ -26,10 +26,12 @@ public class Main {
 	private boolean shotFeature(Tree tree, Dish dish) {
 		if (dish.getFeature() == null)
 			return false;
-		Dish nextDish = tree.searchNextDish(dish, "no");
 		boolean hitFeature = JOptionPane.showConfirmDialog(null, "O prato que você pensou é "+ dish.getFeature() +"?",
 				"Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
-		return   hitFeature ? shotDish(tree, dish, "yes") : nextDish == null ? false : shotFeature(tree, nextDish);
+		Dish nextDish = tree.searchNextDish(dish, hitFeature ? "yes" : "no");
+		return   hitFeature ?
+					nextDish == null ? shotDish(tree, dish, "yes") : shotFeature(tree, nextDish)  : 
+					nextDish == null ? false : shotFeature(tree, nextDish);
 	}
 
 	private boolean shotDish(Tree tree, Dish dish, String answer) {
@@ -52,6 +54,8 @@ public class Main {
 		if (answer.equals("no"))
 			tree.addNo(newDish);
 		else {
+			if (tree.searchNodeContainsDish(tree.getRoot(), dish) != null)
+				tree.setCurrentNode(tree.searchNodeContainsDish(tree.getRoot(), dish));
 			tree.addYes(newDish);
 			return true;
 		}
