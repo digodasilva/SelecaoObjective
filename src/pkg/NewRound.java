@@ -1,4 +1,10 @@
-package model;
+package pkg;
+
+/**
+ * Manage the game rounds.
+ * @author Rodrigo da Silva (digodasilva@gmail.com)
+ * {@link} https://github.com/digodasilva/SelecaoObjective 
+ */
 
 import javax.swing.JOptionPane;
 

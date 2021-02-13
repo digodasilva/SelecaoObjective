@@ -1,4 +1,10 @@
-package model;
+package pkg;
+
+/**
+ * Object to store dish attributes.
+ * @author Rodrigo da Silva (digodasilva@gmail.com)
+ * {@link} https://github.com/digodasilva/SelecaoObjective 
+ */
 
 public class Dish {
 	
