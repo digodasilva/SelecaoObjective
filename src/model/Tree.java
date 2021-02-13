@@ -6,7 +6,8 @@ public class Tree {
     private Node currentNode;
     
     public Tree() {
-    	root = new Node(null, new Node(root, null, null, new Dish("Bolo de Chocolate", null)), null, new Dish("Lasanha", "Massa"));
+    	root = new Node(null, null, null, new Dish("Lasanha", "Massa"));
+    	root.setRightNode(new Node(root, null, null, new Dish("Bolo de Chocolate", null)));
     	currentNode = root;
     }
     
@@ -16,15 +17,23 @@ public class Tree {
      */ 
     public void addNo(Dish dish){
 		Node node = new Node();
-		if (currentNode.getDish() == root.getDish()) {
-			currentNode = new Node(root, null, null, new Dish("Bolo de Chocolate", null));
-		}
 		node.setDish(dish);
-		node.setRightNode(currentNode);
+		node.setParentNode(currentNode);
+		currentNode.setRightNode(node);
+    } 
+    
+    /** 
+     * Add a dish before last node. 
+     * @param dish  
+     */ 
+    public void addPenultimate(Dish dish){
+		Node node = new Node();
+		node.setDish(dish);
+    	node.setRightNode(currentNode);
 		node.setParentNode(currentNode.getParentNode());
+		
 		currentNode.getParentNode().setRightNode(node);
 		currentNode.setParentNode(node);
-		currentNode = root.getRightNode();
     } 
     
     /** 
@@ -40,16 +49,14 @@ public class Tree {
     
    
     /**
-     * Search a next dish.
-     * @param dish
-     * @return dish or null for empty
+     * Search the next dish. The method searchNodeContainsDish method assists in the search.
+     * @param dish, current dish
+     * @param answer, defines direction  of the serch, yes for left or no for right.
+     * @return dish or null for no child found in chosen direction (yes or no).
      */
     public Dish searchNextDish(Dish dish, String answer) {
 		Node node = new Node();
-    	if (root.getDish().equals(dish))
-    		node = root;
-    	else 
-    		node = searchNodeContainsDish(root, dish);
+    	node = searchNodeContainsDish(root, dish);
 		if (node == null)
 			return null;
     	return answer.equals("no") ?
@@ -58,18 +65,53 @@ public class Tree {
 		
 	}
     
+    /**
+     * Look for a node where the dish is, recursively.
+     * @param node: current node, normally root.
+     * @param dish: Dish to be found.
+     * @param justNode: Defines if the method helps to search for a dish (searchNextDish) or if it only searches for the node.
+     * @return node or null for no child found
+     */
+    
     public Node searchNodeContainsDish(Node node, Dish dish) {
+    	if (root.getDish().equals(dish))
+    		return root;
     	Node leftNode = node.getLeftNode() == null ? null : node.getLeftNode();
     	Node rightNode = node.getRightNode() == null ? null : node.getRightNode();
-    	if (leftNode != null && leftNode.getDish().equals(dish)) {
-			return leftNode;
-		} else if (leftNode != null)
-			return searchNodeContainsDish(leftNode, dish);
-		if (rightNode != null && rightNode.getDish().equals(dish)) {
-			return rightNode;
-		} else if (rightNode != null)
-			return searchNodeContainsDish(rightNode, dish);
-		return null;
+    	if (leftNode != null) {
+    		if (leftNode.getDish().equals(dish)) {
+				return leftNode;
+    		} else {
+    			return searchNodeContainsDish(leftNode, dish);
+    		}
+    	}
+		if (rightNode != null) {
+			if (rightNode.getDish().equals(dish)) {
+				return rightNode;
+			} else {
+				return searchNodeContainsDish(rightNode, dish);
+			}
+		}
+		return searchAtRightInParentNode(node, node.getParentNode(), dish);
+	}
+
+    /**
+     * When the search ends on a leaf and the dish is not found, it helps to search within the parents, climbing the tree recursively.. 
+     * @param node: current node.
+     * @param parentNode: parent of the current node.
+     * @param dish: Dish to be found.
+     * @return node
+     */
+	private Node searchAtRightInParentNode(Node node, Node parentNode, Dish dish) {
+    	Node rightParentNode = parentNode.getRightNode() == null ? null : parentNode.getRightNode();
+		if (parentNode.getLeftNode() != null && node.equals(parentNode.getLeftNode())) {
+			if (rightParentNode != null && rightParentNode.getDish().equals(dish)) {
+				return rightParentNode;
+			} else if (rightParentNode != null) {
+				return searchNodeContainsDish(rightParentNode, dish);
+			}
+		}
+		return searchAtRightInParentNode(parentNode, parentNode.getParentNode(), dish);
 	}
 
 	/** 
